@@ -6,9 +6,6 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-//go:embed api-config.yaml
-var apiConfBytes []byte
-
 type APIConf struct {
 	BaseUrl         string `yaml:"base_url"`
 	Port            int    `yaml:"port"`
@@ -25,7 +22,7 @@ type APIConf struct {
 	OpenApiKey      string `yaml:"open_api_key"`
 }
 
-func ParseAPIConf() (*APIConf, error) {
+func ParseAPIConf(apiConfBytes []byte) (*APIConf, error) {
 	c := new(APIConf)
 	return c, yaml.Unmarshal(apiConfBytes, &c)
 }
