@@ -1,0 +1,13 @@
+## Book #{{ .Book.ShortID }}
+_{{ .Book.Description }}_
+_Status_: {{ if .Book.Closed }} **Closed** {{ else }} **Open** {{ end }}
+
+```
+Options:
+{{ range $i, $a := .Book.Options }}
+  - [{{ $i }}] Given Odds: {{ $a.Odds }} : {{ $a.Description }}
+      - Implied Probability: {{ with $odds := index $.ImpliedOdds $a.ID }}{{ $odds.Odds }}% from {{ $odds.Count }} bets {{ else }}N/A{{ end }}
+{{ end }}
+```
+
+_Owner_: @{{ .Book.Owner.DiscordHandle }}

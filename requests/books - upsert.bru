@@ -1,0 +1,41 @@
+meta {
+  name: books - upsert
+  type: http
+  seq: 5
+}
+
+post {
+  url: http://localhost:8081/books
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "id" : "02b26001-742e-448b-9928-894f550a020a",
+    "name" : "test_001",
+    "description" : "test description",
+    "options" : [
+      {
+          "id": "665d9902-1cf7-48c4-8ff9-dabb1e027d34",
+          "book_id": "02b26001-742e-448b-9928-894f550a020a",
+          "description": "test",
+          "odds": 2.8
+      },
+      {
+          "id": "665d9902-1cf7-48c4-8ff9-dabb1e027d33",
+          "book_id": "02b26001-742e-448b-9928-894f550a020a",
+          "description": "test",
+          "odds": 1.3
+      }
+    ],
+    "bets" : [
+      {
+        "id" : "4d50392b-3974-432b-ab4c-0e919cd74fdd",
+        "book_id" : "02b26001-742e-448b-9928-894f550a020a",
+        "outcome_id" : "e77b6604-d032-4e3c-adb6-14b7a4eec190",
+        "amount" : 14.9
+      }
+    ]
+  }
+}
