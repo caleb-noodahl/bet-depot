@@ -27,6 +27,7 @@ func (s *WebServer) UpsertBook(c echo.Context) error {
 	}
 	gettx := s.db.Client.WithContext(ctx).
 		Where(models.Book{StorageBase: models.StorageBase{ID: req.ID}}).
+		Preload("Owner").
 		First(&req)
 	if gettx.Error != nil {
 		return c.JSON(http.StatusInternalServerError, gettx.Error)

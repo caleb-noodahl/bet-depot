@@ -55,7 +55,7 @@ type Book struct {
 	ShortID     string         `json:"short_id" gorm:"uniqueIndex"`
 	Description string         `json:"description"`
 	GameID      uuid.UUID      `json:"game_id"`
-	Game        Game           `json:"owner" gorm:"foreignKey:GameID"`
+	Game        Game           `json:"game" gorm:"foreignKey:GameID"`
 	WagerType   WagerType      `json:"wager_type"`
 	Bets        Bets           `json:"bets" gorm:"foreignKey:BookID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	Options     []Outcome      `json:"options" gorm:"foreignKey:BookID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
