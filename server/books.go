@@ -1,8 +1,9 @@
 package server
 
 import (
-	"github.com/caleb-noodahl/bet-depot/server/models"
 	"net/http"
+
+	"github.com/caleb-noodahl/bet-depot/server/models"
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
@@ -77,6 +78,10 @@ func (s *WebServer) GetTopBooks(c echo.Context) error {
 		return uuid.MustParse(t.ID)
 	})
 	books := []models.Book{}
+	if len(topIDs) == 0 {
+		return c.JSON(http.StatusOK, books)
+	}
+
 	if err := s.db.Client.WithContext(ctx).
 		Preload("Options").
 		Preload("Bets").

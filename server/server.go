@@ -1,12 +1,13 @@
 package server
 
 import (
-	"github.com/caleb-noodahl/bet-depot/config"
-	"github.com/caleb-noodahl/bet-depot/database"
-	"github.com/caleb-noodahl/bet-depot/server/models"
 	"context"
 	"fmt"
 	"net/http"
+
+	"github.com/caleb-noodahl/bet-depot/config"
+	"github.com/caleb-noodahl/bet-depot/database"
+	"github.com/caleb-noodahl/bet-depot/server/models"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"

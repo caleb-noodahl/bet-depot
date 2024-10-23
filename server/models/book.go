@@ -8,13 +8,6 @@ import (
 	"github.com/samber/lo"
 )
 
-type Game struct {
-	StorageBase
-	OwnerID   uuid.UUID `json:"owner_id" gorm:"type:uuid;not null"`
-	Owner     User      `json:"owner" gorm:"foreignKey:OwnerID;"`
-	
-}
-
 type Bet struct {
 	StorageBase
 	OwnerID   uuid.UUID `json:"owner_id" gorm:"type:uuid;not null"`
@@ -61,6 +54,8 @@ type Book struct {
 	Name        string         `json:"name"`
 	ShortID     string         `json:"short_id" gorm:"uniqueIndex"`
 	Description string         `json:"description"`
+	GameID      uuid.UUID      `json:"game_id"`
+	Game        Game           `json:"owner" gorm:"foreignKey:GameID"`
 	WagerType   WagerType      `json:"wager_type"`
 	Bets        Bets           `json:"bets" gorm:"foreignKey:BookID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	Options     []Outcome      `json:"options" gorm:"foreignKey:BookID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`

@@ -17,6 +17,7 @@ require (
 )
 
 require (
+	github.com/adhocore/gronx v1.19.1 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
