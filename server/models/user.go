@@ -6,7 +6,7 @@ type User struct {
 	StorageBase
 	DiscordID     string `json:"discord_id" gorm:"uniqueIndex"`
 	DiscordHandle string `json:"discord_handle"`
-	Username      string `json:"username" gorm:"not null;`
+	Username      string `json:"username" gorm:"not null;"`
 	Email         string `json:"email"`
 }
 

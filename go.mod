@@ -3,6 +3,7 @@ module github.com/caleb-noodahl/bet-depot
 go 1.23.0
 
 require (
+	github.com/adhocore/gronx v1.19.1
 	github.com/bwmarrin/discordgo v0.28.1
 	github.com/go-resty/resty/v2 v2.15.3
 	github.com/google/uuid v1.6.0
@@ -17,7 +18,6 @@ require (
 )
 
 require (
-	github.com/adhocore/gronx v1.19.1 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect

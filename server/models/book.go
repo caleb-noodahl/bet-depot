@@ -10,9 +10,9 @@ import (
 
 type Bet struct {
 	StorageBase
-	OwnerID   uuid.UUID `json:"owner_id" gorm:"type:uuid;not null"`
+	OwnerID   uuid.UUID `json:"owner_id" gorm:"type:uuid;not null;index:idx_owner_book,unique"`
 	Owner     User      `json:"owner" gorm:"foreignKey:OwnerID;"`
-	BookID    uuid.UUID `json:"book_id" gorm:"type:uuid;not null"`
+	BookID    uuid.UUID `json:"book_id" gorm:"type:uuid;not null;index:idx_owner_book,unique"`
 	OutcomeID uuid.UUID `json:"outcome_id"`
 	Outcome   Outcome   `json:"outcome" gorm:"foreignKey:OutcomeID"`
 	Amount    float64   `json:"amount"`

@@ -145,17 +145,12 @@ func (s *WebServer) UpsertBet(c echo.Context) error {
 
 	createtx := s.db.Client.WithContext(ctx).
 		Clauses(clause.OnConflict{UpdateAll: true}).
-		Create(&req)
+		Preload("Outcome").
+		FirstOrCreate(&req)
 	if createtx.Error != nil {
 		return c.JSON(http.StatusInternalServerError, createtx.Error)
 	}
-	gettx := s.db.Client.WithContext(ctx).
-		Where(models.Bet{StorageBase: models.StorageBase{ID: req.ID}}).
-		Preload("Outcome").
-		First(&req)
-	if gettx.Error != nil {
-		return c.JSON(http.StatusInternalServerError, gettx.Error)
-	}
+
 	return c.JSON(http.StatusOK, req)
 }
 
