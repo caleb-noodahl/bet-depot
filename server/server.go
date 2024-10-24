@@ -42,6 +42,8 @@ func NewWebServer(ctx context.Context, config *config.APIConf, db database.Postg
 
 	s.client.GET("/user", s.GetUser, s.LogAPIRequest)
 	s.client.POST("/users", s.UpsertUser, s.LogAPIRequest)
+	s.client.GET("/wallet", s.GetWallet, s.LogAPIRequest)
+	s.client.POST("/tx", s.CreateTransaction, s.LogAPIRequest)
 
 	s.client.POST("/bets", s.UpsertBet, s.LogAPIRequest)
 

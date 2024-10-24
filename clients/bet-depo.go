@@ -1,11 +1,12 @@
 package clients
 
 import (
-	"github.com/caleb-noodahl/bet-depot/config"
-	"github.com/caleb-noodahl/bet-depot/server/models"
 	"context"
 	"encoding/json"
 	"fmt"
+
+	"github.com/caleb-noodahl/bet-depot/config"
+	"github.com/caleb-noodahl/bet-depot/server/models"
 
 	"github.com/go-resty/resty/v2"
 )
@@ -103,5 +104,29 @@ func (b *BetDepotClient) UpsertOutcome(ctx context.Context, outcome models.Outco
 		SetBody(outcome).
 		SetResult(&out).
 		Post(fmt.Sprintf("%s/outcomes", b.conf.BaseUrl))
+	return out, err
+}
+
+func (b *BetDepotClient) GetWallet(ctx context.Context, wallet models.Wallet) (models.Wallet, error) {
+	out := models.Wallet{}
+	_, err := b.client.R().
+		SetQueryParams(map[string]string{
+			"id":         wallet.ID.String(),
+			"user_id":    wallet.User.ID.String(),
+			"discord_id": wallet.User.DiscordID,
+			"username":   wallet.User.Username,
+		}).
+		SetResult(&out).
+		Get(fmt.Sprintf("%s/wallet", b.conf.BaseUrl))
+	return out, err
+}
+
+func (b *BetDepotClient) CreateTx(ctx context.Context, tx models.Transaction) (models.Transaction, error) {
+	out := models.Transaction{}
+	_, err := b.client.R().
+		SetHeader("Content-Type", "application/json").
+		SetBody(tx).
+		SetResult(&out).
+		Post(fmt.Sprintf("%s/tx", b.conf.BaseUrl))
 	return out, err
 }

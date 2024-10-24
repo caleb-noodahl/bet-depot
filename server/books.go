@@ -112,6 +112,27 @@ func (s *WebServer) CloseBook(c echo.Context) error {
 	if gettx.Error != nil {
 		return c.JSON(http.StatusInternalServerError, gettx.Error)
 	}
+
+	for _, payout := range req.Payouts {
+		wallet := models.Wallet{
+			UserID: payout.UserID,
+			Txs:    []models.Transaction{},
+		}
+		walletctx := s.db.Client.WithContext(ctx).
+			Where(models.Wallet{UserID: payout.UserID}).
+			FirstOrCreate(&wallet)
+		if walletctx.Error != nil {
+			return c.JSON(http.StatusInternalServerError, walletctx.Error)
+		}
+		wallet.AddTx(models.Transaction{
+			Amount:   payout.Amount,
+			WalletID: wallet.ID,
+		})
+		walletctx = s.db.Client.WithContext(ctx).Save(wallet)
+		if walletctx.Error != nil {
+			return c.JSON(http.StatusInternalServerError, walletctx.Error)
+		}
+	}
 	return c.JSON(http.StatusOK, req)
 }
 
