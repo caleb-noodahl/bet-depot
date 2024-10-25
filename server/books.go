@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/samber/lo"
+	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
@@ -39,7 +40,9 @@ func (s *WebServer) GetBooks(c echo.Context) error {
 	}
 
 	result := s.db.Client.WithContext(ctx).
-		Preload("Options").
+		Preload("Options", func(db *gorm.DB) *gorm.DB {
+			return db.Order("created_at ASC")
+		}).
 		Preload("Bets").
 		Order("created_at").
 		Preload("Owner").
@@ -52,7 +55,6 @@ func (s *WebServer) GetBooks(c echo.Context) error {
 
 type topBooks struct {
 	ID       string `json:"id"`
-	Closed   bool   `json:"closed"`
 	BetCount int    `json:"bet_count"`
 }
 
@@ -61,7 +63,7 @@ func (s *WebServer) GetTopBooks(c echo.Context) error {
 	top := []topBooks{}
 	if err := s.db.Client.WithContext(ctx).
 		Table("books").
-		Select("books.id, COUNT(bets.id) as bet_count, books.closed").
+		Select("books.id, COUNT(bets.id) as bet_count").
 		Joins("JOIN bets ON bets.book_id = books.id").
 		Where("books.closed = ?", false).
 		Group("books.id").
@@ -82,7 +84,9 @@ func (s *WebServer) GetTopBooks(c echo.Context) error {
 	}
 
 	if err := s.db.Client.WithContext(ctx).
-		Preload("Options").
+		Preload("Options", func(db *gorm.DB) *gorm.DB {
+			return db.Order("created_at ASC")
+		}).
 		Preload("Bets").
 		Find(&books, topIDs).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
