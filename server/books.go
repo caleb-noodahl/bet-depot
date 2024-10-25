@@ -72,6 +72,9 @@ func (s *WebServer) GetTopBooks(c echo.Context) error {
 	topIDs := lo.Map(top, func(t topBooks, _ int) uuid.UUID {
 		return uuid.MustParse(t.ID)
 	})
+	if len(topIDs) == 0 {
+		return c.JSON(http.StatusOK, top)
+	}
 	books := []models.Book{}
 	if len(topIDs) == 0 {
 		return c.JSON(http.StatusOK, books)
@@ -107,6 +110,7 @@ func (s *WebServer) CloseBook(c echo.Context) error {
 		}
 		walletctx := s.db.Client.WithContext(ctx).
 			Where(models.Wallet{UserID: payout.UserID}).
+			Preload("Txs").
 			FirstOrCreate(&wallet)
 		if walletctx.Error != nil {
 			return c.JSON(http.StatusInternalServerError, walletctx.Error)
@@ -145,6 +149,7 @@ func (s *WebServer) UpsertBet(c echo.Context) error {
 	}
 
 	wallettx := s.db.Client.WithContext(ctx).
+		Preload("Txs").
 		FirstOrCreate(&wallet, &query)
 	if wallettx.Error != nil {
 		return c.JSON(http.StatusInternalServerError, wallettx.Error)

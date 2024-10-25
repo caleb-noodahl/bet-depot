@@ -31,5 +31,7 @@ type Wallet struct {
 
 func (w *Wallet) AddTx(tx Transaction) {
 	w.Txs = append(w.Txs, tx)
-	w.Balance = lo.SumBy(w.Txs, func(tx Transaction) float64 { return tx.Amount })
+	w.Balance = lo.SumBy(w.Txs, func(tx Transaction) float64 {
+		return tx.Amount
+	})
 }
