@@ -12,8 +12,10 @@ type User struct {
 
 type Transaction struct {
 	StorageBase
-	WalletID uuid.UUID `json:"wallet_id" gorm:"uniqueIndex"`
-	Amount   float64   `json:"amount"`
+	WalletID   uuid.UUID `json:"wallet_id" gorm:"uniqueIndex"`
+	SourceID   uuid.UUID `json:"source_id"`
+	SourceType string    `json:"source_type"`
+	Amount     float64   `json:"amount"`
 }
 
 type Wallet struct {

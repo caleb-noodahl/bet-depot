@@ -114,9 +114,9 @@ func (b Bets) ImpliedOdds() map[uuid.UUID]Probability {
 			count++
 			return i.Amount
 		})
-		// Directly calculate implied probability as a percentage
+		// directly calculate implied probability as a percentage
 		percent := math.Round((betTotal / total) * 100)
-		// Store the probability (percentage) directly
+		// store the probability (percentage) directly
 		results[key] = Probability{
 			Outcome: key,
 			Odds:    percent,

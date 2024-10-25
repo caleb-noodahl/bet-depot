@@ -21,17 +21,11 @@ func (s *WebServer) UpsertBook(c echo.Context) error {
 
 	createtx := s.db.Client.WithContext(ctx).
 		Clauses(clause.OnConflict{UpdateAll: true}).
-		Create(&req)
+		FirstOrCreate(&req)
 	if createtx.Error != nil {
 		return c.JSON(http.StatusInternalServerError, createtx.Error)
 	}
-	gettx := s.db.Client.WithContext(ctx).
-		Where(models.Book{StorageBase: models.StorageBase{ID: req.ID}}).
-		Preload("Owner").
-		First(&req)
-	if gettx.Error != nil {
-		return c.JSON(http.StatusInternalServerError, gettx.Error)
-	}
+
 	return c.JSON(http.StatusOK, req)
 }
 
@@ -100,17 +94,9 @@ func (s *WebServer) CloseBook(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 
-	createtx := s.db.Client.WithContext(ctx).
-		Clauses(clause.OnConflict{UpdateAll: true}).
-		Create(&req)
-	if createtx.Error != nil {
-		return c.JSON(http.StatusInternalServerError, createtx.Error)
-	}
-	gettx := s.db.Client.WithContext(ctx).
-		Where(models.Book{StorageBase: models.StorageBase{ID: req.ID}}).
-		First(&req)
-	if gettx.Error != nil {
-		return c.JSON(http.StatusInternalServerError, gettx.Error)
+	booktx := s.db.Client.WithContext(ctx).First(&req)
+	if booktx.Error != nil {
+		return c.JSON(http.StatusInternalServerError, booktx.Error)
 	}
 
 	for _, payout := range req.Payouts {
@@ -125,8 +111,10 @@ func (s *WebServer) CloseBook(c echo.Context) error {
 			return c.JSON(http.StatusInternalServerError, walletctx.Error)
 		}
 		wallet.AddTx(models.Transaction{
-			Amount:   payout.Amount,
-			WalletID: wallet.ID,
+			Amount:     payout.Amount,
+			WalletID:   wallet.ID,
+			SourceID:   req.BookID,
+			SourceType: "book_close",
 		})
 		walletctx = s.db.Client.WithContext(ctx).Save(wallet)
 		if walletctx.Error != nil {
@@ -146,9 +134,30 @@ func (s *WebServer) UpsertBet(c echo.Context) error {
 	createtx := s.db.Client.WithContext(ctx).
 		Clauses(clause.OnConflict{UpdateAll: true}).
 		Preload("Outcome").
-		FirstOrCreate(&req)
+		Save(&req)
 	if createtx.Error != nil {
 		return c.JSON(http.StatusInternalServerError, createtx.Error)
+	}
+	wallet, query := models.Wallet{}, models.Wallet{
+		UserID: req.OwnerID,
+		User:   req.Owner,
+	}
+
+	wallettx := s.db.Client.WithContext(ctx).
+		FirstOrCreate(&wallet, &query)
+	if wallettx.Error != nil {
+		return c.JSON(http.StatusInternalServerError, wallettx.Error)
+	}
+
+	wallet.AddTx(models.Transaction{
+		WalletID:   wallet.ID,
+		SourceID:   req.StorageBase.ID,
+		SourceType: "bet",
+		Amount:     req.Amount * -1,
+	})
+	wallettx = s.db.Client.WithContext(ctx).Save(&wallet)
+	if wallettx.Error != nil {
+		return c.JSON(http.StatusInternalServerError, wallettx.Error)
 	}
 
 	return c.JSON(http.StatusOK, req)
@@ -163,15 +172,9 @@ func (s *WebServer) UpsertOutcome(c echo.Context) error {
 
 	createtx := s.db.Client.WithContext(ctx).
 		Clauses(clause.OnConflict{UpdateAll: true}).
-		Create(&req)
+		Save(&req)
 	if createtx.Error != nil {
 		return c.JSON(http.StatusInternalServerError, createtx.Error)
-	}
-	gettx := s.db.Client.WithContext(ctx).
-		Where(models.Outcome{StorageBase: models.StorageBase{ID: req.ID}}).
-		First(&req)
-	if gettx.Error != nil {
-		return c.JSON(http.StatusInternalServerError, gettx.Error)
 	}
 	return c.JSON(http.StatusOK, req)
 }
