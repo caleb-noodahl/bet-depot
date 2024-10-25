@@ -94,7 +94,8 @@ func (s *WebServer) CloseBook(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 
-	booktx := s.db.Client.WithContext(ctx).First(&req)
+	booktx := s.db.Client.WithContext(ctx).
+		Save(&req)
 	if booktx.Error != nil {
 		return c.JSON(http.StatusInternalServerError, booktx.Error)
 	}

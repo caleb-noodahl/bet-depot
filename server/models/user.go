@@ -1,6 +1,9 @@
 package models
 
-import "github.com/google/uuid"
+import (
+	"github.com/google/uuid"
+	"github.com/samber/lo"
+)
 
 type User struct {
 	StorageBase
@@ -12,7 +15,7 @@ type User struct {
 
 type Transaction struct {
 	StorageBase
-	WalletID   uuid.UUID `json:"wallet_id" gorm:"uniqueIndex"`
+	WalletID   uuid.UUID `json:"wallet_id"`
 	SourceID   uuid.UUID `json:"source_id"`
 	SourceType string    `json:"source_type"`
 	Amount     float64   `json:"amount"`
@@ -27,6 +30,6 @@ type Wallet struct {
 }
 
 func (w *Wallet) AddTx(tx Transaction) {
-	w.Balance += tx.Amount
 	w.Txs = append(w.Txs, tx)
+	w.Balance = lo.SumBy(w.Txs, func(tx Transaction) float64 { return tx.Amount })
 }

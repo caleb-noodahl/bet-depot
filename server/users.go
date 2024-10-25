@@ -66,6 +66,7 @@ func (s *WebServer) GetWallet(c echo.Context) error {
 	}
 	walletctx := s.db.Client.WithContext(ctx).
 		Preload("User").
+		Preload("Txs").
 		FirstOrCreate(&wallet, &wq)
 	if walletctx.Error != nil {
 		return c.JSON(http.StatusInternalServerError, walletctx.Error)
