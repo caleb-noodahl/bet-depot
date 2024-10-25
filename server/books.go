@@ -52,6 +52,7 @@ func (s *WebServer) GetBooks(c echo.Context) error {
 
 type topBooks struct {
 	ID       string `json:"id"`
+	Closed   bool   `json:"closed"`
 	BetCount int    `json:"bet_count"`
 }
 
@@ -60,7 +61,7 @@ func (s *WebServer) GetTopBooks(c echo.Context) error {
 	top := []topBooks{}
 	if err := s.db.Client.WithContext(ctx).
 		Table("books").
-		Select("books.id, COUNT(bets.id) as bet_count").
+		Select("books.id, COUNT(bets.id) as bet_count, books.closed").
 		Joins("JOIN bets ON bets.book_id = books.id").
 		Where("books.closed = ?", false).
 		Group("books.id").
@@ -97,10 +98,22 @@ func (s *WebServer) CloseBook(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 
+	book := models.Book{}
 	booktx := s.db.Client.WithContext(ctx).
-		Save(&req)
+		First(&book, &models.Book{StorageBase: models.StorageBase{ID: req.BookID}})
 	if booktx.Error != nil {
 		return c.JSON(http.StatusInternalServerError, booktx.Error)
+	}
+	book.Closed = true
+	booktx = s.db.Client.WithContext(ctx).Save(&book)
+	if booktx.Error != nil {
+		return c.JSON(http.StatusInternalServerError, booktx.Error)
+	}
+
+	closedbooktx := s.db.Client.WithContext(ctx).
+		Save(&req)
+	if closedbooktx.Error != nil {
+		return c.JSON(http.StatusInternalServerError, closedbooktx.Error)
 	}
 
 	for _, payout := range req.Payouts {
