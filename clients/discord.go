@@ -1,13 +1,14 @@
 package clients
 
 import (
-	"github.com/caleb-noodahl/bet-depot/config"
 	"context"
 	"log"
 	"os"
 	"os/signal"
 	"strings"
 	"syscall"
+
+	"github.com/caleb-noodahl/bet-depot/config"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -54,6 +55,7 @@ func (d *DiscordClient) MessageRouter(s *discordgo.Session, m *discordgo.Message
 
 	if val, ok := d.Cmds[input[0]]; ok {
 		if err := val(s, m); err != nil {
+			s.ChannelMessageSend(m.Author.ID, err.Error())
 			log.Printf(" != error: %s", err)
 		}
 	}
