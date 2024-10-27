@@ -2,17 +2,19 @@ package models
 
 import (
 	"math"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/lib/pq"
 	"github.com/samber/lo"
+	"gorm.io/gorm"
 )
 
 type Bet struct {
 	StorageBase
-	OwnerID   uuid.UUID `json:"owner_id" gorm:"type:uuid;not null;index:idx_owner_book,unique"`
+	OwnerID   uuid.UUID `json:"owner_id" gorm:"type:uuid;not null;"`
 	Owner     User      `json:"owner" gorm:"foreignKey:OwnerID;"`
-	BookID    uuid.UUID `json:"book_id" gorm:"type:uuid;not null;index:idx_owner_book,unique"`
+	BookID    uuid.UUID `json:"book_id" gorm:"type:uuid;not null;"`
 	OutcomeID uuid.UUID `json:"outcome_id"`
 	Outcome   Outcome   `json:"outcome" gorm:"foreignKey:OutcomeID"`
 	Amount    float64   `json:"amount"`
@@ -23,6 +25,7 @@ type Outcome struct {
 	BookID      uuid.UUID `json:"book_id" gorm:"type:uuid;not null"`
 	Description string    `json:"description"`
 	Odds        float64   `json:"odds"`
+	RefVal      float64   `json:"ref_val"`
 }
 
 type Payout struct {
@@ -62,7 +65,18 @@ type Book struct {
 	OwnerID     uuid.UUID      `json:"owner_id"`
 	Owner       User           `json:"owner" gorm:"foreignKey:OwnerID"`
 	Closed      bool           `json:"closed"`
+	Open        time.Time      `json:"open"`
+	LastCall    time.Time      `json:"last_call"`
+	MaxBet      float64        `json:"max_bet"`
 	Tags        pq.StringArray `json:"tags" gorm:"type:text[]"`
+}
+
+func (b *Book) BeforeCreate(tx *gorm.DB) (err error) {
+	if b.ID == uuid.Nil {
+		b.ID = uuid.New()
+	}
+	b.ShortID = b.ID.String()[:4]
+	return
 }
 
 func (b *Book) CloseBook(outcomeIndex int) ClosedBook {
@@ -89,13 +103,6 @@ func (b *Book) CloseBook(outcomeIndex int) ClosedBook {
 	}
 	closed.TotalPayout = total
 	return closed
-}
-
-func (b *Book) SetDefaults() {
-	if b.ID == uuid.Nil {
-		b.ID = uuid.New()
-		b.ShortID = b.ID.String()[:4]
-	}
 }
 
 type Bets []Bet

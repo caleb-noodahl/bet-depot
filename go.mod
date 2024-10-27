@@ -18,6 +18,10 @@ require (
 )
 
 require (
+	github.com/Finnhub-Stock-API/finnhub-go v1.2.1 // indirect
+	github.com/Rhymond/go-money v1.0.14 // indirect
+	github.com/antihax/optional v1.0.0 // indirect
+	github.com/golang/protobuf v1.2.0 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
@@ -33,7 +37,9 @@ require (
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	golang.org/x/crypto v0.25.0 // indirect
 	golang.org/x/net v0.27.0 // indirect
+	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45 // indirect
 	golang.org/x/sync v0.7.0 // indirect
 	golang.org/x/sys v0.22.0 // indirect
 	golang.org/x/text v0.16.0 // indirect
+	google.golang.org/appengine v1.4.0 // indirect
 )

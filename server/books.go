@@ -2,6 +2,7 @@ package server
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/caleb-noodahl/bet-depot/server/models"
 
@@ -18,7 +19,6 @@ func (s *WebServer) UpsertBook(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
-	req.SetDefaults()
 
 	createtx := s.db.Client.WithContext(ctx).
 		Clauses(clause.OnConflict{UpdateAll: true}).
@@ -64,7 +64,7 @@ func (s *WebServer) GetTopBooks(c echo.Context) error {
 	if err := s.db.Client.WithContext(ctx).
 		Table("books").
 		Select("books.id, COUNT(bets.id) as bet_count").
-		Joins("JOIN bets ON bets.book_id = books.id").
+		Joins("LEFT JOIN bets ON bets.book_id = books.id").
 		Where("books.closed = ?", false).
 		Group("books.id").
 		Limit(3).
@@ -108,6 +108,7 @@ func (s *WebServer) CloseBook(c echo.Context) error {
 	if booktx.Error != nil {
 		return c.JSON(http.StatusInternalServerError, booktx.Error)
 	}
+
 	book.Closed = true
 	booktx = s.db.Client.WithContext(ctx).Save(&book)
 	if booktx.Error != nil {
@@ -153,13 +154,29 @@ func (s *WebServer) UpsertBet(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 
+	// fetch book to determine betting is still open
+	book := models.Book{}
+	booktx := s.db.Client.WithContext(ctx).
+		First(&book, &models.Book{StorageBase: models.StorageBase{ID: req.BookID}})
+	if booktx.Error != nil {
+		return c.JSON(http.StatusInternalServerError, booktx.Error)
+	}
+
+	// Check if the book is closed or the last call period has passed
+	if book.Closed || (!book.LastCall.IsZero() && time.Now().After(book.LastCall)) {
+		return c.JSON(http.StatusForbidden, "Bets are no longer accepted for this book.")
+	}
+
 	createtx := s.db.Client.WithContext(ctx).
-		Clauses(clause.OnConflict{UpdateAll: true}).
 		Preload("Outcome").
-		Save(&req)
+		Create(&req)
 	if createtx.Error != nil {
+		if gorm.ErrDuplicatedKey == createtx.Error {
+			return c.JSON(http.StatusConflict, "A bet already exists for this user on this book.")
+		}
 		return c.JSON(http.StatusInternalServerError, createtx.Error)
 	}
+
 	wallet, query := models.Wallet{}, models.Wallet{
 		UserID: req.OwnerID,
 		User:   req.Owner,

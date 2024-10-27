@@ -20,6 +20,17 @@ type APIConf struct {
 	DiscordBotToken string `yaml:"discord_bot_token"`
 	DiscordGuild    string `yaml:"discord_guild"`
 	OpenApiKey      string `yaml:"open_api_key"`
+	FinnhubApiKey   string `yaml:"finnhub_api_key"`
+}
+
+type GamesConfig struct {
+	AdminID string   `yaml:"admin_id"`
+	Symbols []string `yaml:"symbols"`
+}
+
+func ParseGamesConf(gamesConfigBytes []byte) (*GamesConfig, error) {
+	c := new(GamesConfig)
+	return c, yaml.Unmarshal(gamesConfigBytes, &c)
 }
 
 func ParseAPIConf(apiConfBytes []byte) (*APIConf, error) {
