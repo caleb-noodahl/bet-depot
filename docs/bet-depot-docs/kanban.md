@@ -14,19 +14,18 @@ kanban-plugin: board
 	- [ ] news
 	- [ ] online tournament
 - [ ] guild specific bets
+- [ ] env variable parsing
 
 
 ## bot
 
 - [ ] notification / whisper
-- [ ] 
 - [ ] Wallet table formatting
 	[go-pretty ](https://github.com/jedib0t/go-pretty)
 - [ ] dev bot config
 	- [ ] setup discord bot-dev account
 	- [ ] handle env variable injection better
 - [ ] guild specific bets
-- [ ] configurable cmd invoke
 
 
 ## done

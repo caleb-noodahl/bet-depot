@@ -3,6 +3,7 @@ module github.com/caleb-noodahl/bet-depot
 go 1.23.0
 
 require (
+	github.com/Finnhub-Stock-API/finnhub-go v1.2.1
 	github.com/adhocore/gronx v1.19.1
 	github.com/bwmarrin/discordgo v0.28.1
 	github.com/go-resty/resty/v2 v2.15.3
@@ -18,8 +19,6 @@ require (
 )
 
 require (
-	github.com/Finnhub-Stock-API/finnhub-go v1.2.1 // indirect
-	github.com/Rhymond/go-money v1.0.14 // indirect
 	github.com/antihax/optional v1.0.0 // indirect
 	github.com/golang/protobuf v1.2.0 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
