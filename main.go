@@ -16,7 +16,7 @@ var data embed.FS
 
 func main() {
 	ctx := context.Background()
-	confBytes, err := data.ReadFile("config/data/api-config-dev.yaml")
+	confBytes, err := data.ReadFile("config/data/api-config.yaml")
 	if err != nil {
 		log.Panic(err)
 	}
